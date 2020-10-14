@@ -1,5 +1,7 @@
 # louis_painting
 
-Application to ease the business needs of Louis' Painting
+Application to ease the business needs of Louis' Painting.
+
+Developed in Flutter/Dart and Firebase
 
 

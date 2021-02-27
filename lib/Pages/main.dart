@@ -1,22 +1,14 @@
 import 'package:flutter/material.dart';
-import 'mainscreen.dart';
+//import 'HomePage.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
+import 'package:louis_painting/Pages/welcome.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
-
-// invoice
-// Invoice for:
-// Company Name
-// company address
-// due date
-// project name
-// invoice number
-// Payable to :
-// description
-// qty
-// unit price
-// total price
 
 class MyApp extends StatelessWidget {
   @override
@@ -27,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MainScreen(),
+      home: new WelcomePage(),
     );
   }
 }

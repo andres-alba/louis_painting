@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "58272562630",
+    "firebase_url": "https://loui-s-painting.firebaseio.com",
+    "project_id": "loui-s-painting",
+    "storage_bucket": "loui-s-painting.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:58272562630:android:37fa59ef768d6d2c1b86c7",
+        "android_client_info": {
+          "package_name": "org.andresalba.louis_painting"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "58272562630-1oi140824fn97bk0dmj218aq9130f0bu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAu_0w75AsRVWrYkMZnJ9K78fXilcXHzlg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "58272562630-1oi140824fn97bk0dmj218aq9130f0bu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:louis_painting/Pages/setup/loginscreen.dart';
-import 'package:louis_painting/Pages/setup/sign_up.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'HomePage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'auth_services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class WelcomePage extends StatefulWidget {
@@ -17,12 +14,18 @@ class _WelcomePageState extends State<WelcomePage> {
   Color primaryColor = Color(0xff18203d);
   Color secondaryColor = Color(0xff232c51);
   Color logoGreen = Color(0xff25bcbb);
-
   String error = '';
-
   TextEditingController emailcontroller = TextEditingController(text: "");
   TextEditingController passwordcontroller = TextEditingController(text: "");
-  //final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool showProgress = false;
+  bool _isGoogleLoggedIn = false;
+
+  GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email'],
+  );
+
+  //final FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,30 +96,35 @@ class _WelcomePageState extends State<WelcomePage> {
                   minWidth: double.maxFinite,
                   height: 50,
                   onPressed: () async {
+                    final _auth = FirebaseAuth.instance;
+                    User user;
+                    setState(() {
+                      showProgress = true;
+                    });
+
                     try {
-                      FirebaseUser user = (await FirebaseAuth.instance
-                              .signInWithEmailAndPassword(
-                                  email: emailcontroller.text,
-                                  password: passwordcontroller.text))
+                      user = (await _auth.signInWithEmailAndPassword(
+                              email: emailcontroller.text.trim(),
+                              password: passwordcontroller.text))
                           .user;
 
                       if (user != null) {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => HomePage()));
+                        setState(() {
+                          showProgress = false;
+                        });
                       }
                     } catch (e) {
+                      //inal snackBar = SnackBar(
+                      //    content: Text('Por favor escribe la clave correcta'));
+                      //Scaffold.of(context).showSnackBar(snackBar);
                       print(e.message);
                       passwordcontroller.text = "";
                     }
                   },
-
-                  /*
-                => AuthServices.signIn(
-                        emailcontroller.text, passwordcontroller.text)
-                    .whenComplete(() => Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => HomePage())))*/
                   color: logoGreen,
                   child: Text('Login',
                       style: TextStyle(color: Colors.white, fontSize: 16)),
@@ -126,22 +134,27 @@ class _WelcomePageState extends State<WelcomePage> {
                 elevation: 0,
                 minWidth: double.maxFinite,
                 height: 50,
-                onPressed: () {},
-                /*onPressed: () async {
-                  //google sign in
-                  final GoogleSignInAccount googleUser =
-                      await googleSignIn.signIn();
-                  final GoogleSignInAuthentication googleAuth =
-                      await googleUser.authentication;
+                onPressed: () {
+                  var result = _signInWithGoogle();
 
-                  final AuthCredential credential =
-                      GoogleAuthProvider.getCredential(
-                          idToken: googleAuth.idToken,
-                          accessToken: googleAuth.accessToken);
+                  if (result != null) {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => HomePage()));
+                  }
+                  /*
 
-                  final FirebaseUser user =
-                      (await firebaseAuth.signInWithCredential(credential)).user;
-                },*/
+                  _signInWithGoogle().then((result) {
+                    if (result != null) {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return HomePage();
+                          },
+                        ),
+                      );
+                    }
+                  });*/
+                },
                 color: Colors.blue,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -156,56 +169,6 @@ class _WelcomePageState extends State<WelcomePage> {
               ),
               SizedBox(height: 60),
               _buildFooterLogo()
-
-              /*Form(
-                key: _formKey,
-                child: Column(
-                  children: <Widget>[
-                    TextFormField(
-                      validator: (input) {
-                        if (input.isEmpty) {
-                          return 'Please type an email';
-                        }
-                        return null;
-                      },
-                      onSaved: (input) => _email = input,
-                      decoration: InputDecoration(
-                          labelText: 'Email',
-                          icon: Icon(Icons.email, color: Colors.white),
-                          labelStyle: TextStyle(color: Colors.white)),
-                    ),
-                    TextFormField(
-                      validator: (input) {
-                        if (input.length < 6) {
-                          return "Password needs to be at least 6 characters.";
-                        }
-                        return null;
-                      },
-                      onSaved: (input) => _password = input,
-                      decoration: InputDecoration(
-                          labelText: 'Password',
-                          labelStyle: TextStyle(color: Colors.white)),
-                      obscureText: true,
-                    ),
-                    RaisedButton(
-                      onPressed: signIn,
-                      child: Text('Login'),
-                    )
-                  ],
-                ),
-              ),*/
-              /*Column(
-                children: <Widget>[
-                  RaisedButton(
-                    onPressed: navigateToSignIn,
-                    child: Text('Sign in'),
-                  ),
-                  RaisedButton(
-                    onPressed: navigateToSignUp,
-                    child: Text('Sign up'),
-                  ),
-                ],
-              ),*/
             ])),
       ),
     );
@@ -229,32 +192,23 @@ class _WelcomePageState extends State<WelcomePage> {
     );
   }
 
-  void navigateToSignIn() {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => LoginScreen(), fullscreenDialog: true));
-  }
-
-  void navigateToSignUp() {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => SignUp(), fullscreenDialog: true));
-  }
-
-  Future<void> signIn() async {
+  _signInWithGoogle() async {
     try {
-      FirebaseUser user = (await FirebaseAuth.instance
-              .signInWithEmailAndPassword(
-                  email: emailcontroller.text,
-                  password: passwordcontroller.text))
-          .user;
-
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => HomePage(user: user)));
-    } catch (e) {
-      print(e.message);
+      await _googleSignIn.signIn();
+      setState(() {
+        _googleSignIn.currentUser != null
+            ? _isGoogleLoggedIn = true
+            : _isGoogleLoggedIn = false;
+      });
+    } catch (err) {
+      print(err);
     }
+  }
+
+  signOutWithGoogle() {
+    _googleSignIn.signOut();
+    setState(() {
+      _isGoogleLoggedIn = false;
+    });
   }
 }

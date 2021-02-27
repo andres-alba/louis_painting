@@ -1,40 +1,30 @@
 import 'package:flutter/material.dart';
 
-int index = 0;
+class FirstPage extends StatefulWidget {
+  @override
+  _FirstPageState createState() => _FirstPageState();
+}
 
-class MainScreen extends StatelessWidget {
+class _FirstPageState extends State<FirstPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Home Screen"),
-        leading: IconButton(icon: Icon(Icons.menu), onPressed: () {}),
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.search), onPressed: () {})
-        ],
-      ),
-      backgroundColor: Colors.black,
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          new BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            title: Text('Home'),
-          ),
-          new BottomNavigationBarItem(
-            icon: Icon(Icons.attach_file),
-            title: Text('Invoices'),
-          ),
-          new BottomNavigationBarItem(
-            icon: Icon(Icons.info),
-            title: Text('About'),
-          ),
-        ],
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       body: Center(
         //SafeArea - display widget where it does not disturb clock, wifi icon, etc..
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            MaterialButton(
+              color: Colors.blue,
+              child: Text('Logout',
+                  style: TextStyle(color: Colors.white, fontSize: 16)),
+              textColor: Colors.white,
+              onPressed: () {},
+            ),
             CircleAvatar(
               radius: 50.0,
               backgroundColor: Colors.white70,
